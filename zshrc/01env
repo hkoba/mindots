@@ -1,0 +1,16 @@
+HISTFILE=$HOME/.history.d/$HOST.$TTY:t
+[[ -d $HISTFILE:h ]] || mkdir $HISTFILE:h
+HISTSIZE=2048
+SAVEHIST=$HISTSIZE
+
+if (( $SHLVL > 1 )) ;then
+  PROMPT="%SZ%s-%m($SHLVL"":%l)%% "
+else
+  PROMPT="%SZ%s-%m(%l)%% "
+fi
+
+PROMPT2='> '
+PROMPT3='? '
+PROMPT4='+ '
+RPROMPT='%B%~%b'
+export RPROMPT

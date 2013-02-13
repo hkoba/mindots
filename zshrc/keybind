@@ -1,0 +1,54 @@
+if [[ -z $rc_processed ]] ;then
+WORDCHARS=''
+setopt autolist listtypes extendedglob
+
+ttyctl -u
+stty -ixon -ixoff dec intr '^C' erase '^H' kill '^U' eof '^D' susp '^Z'
+ttyctl -f
+
+# Emacs を基本に。
+bindkey -e
+
+# 単語移動系
+bindkey -r '^q'
+bindkey '^q'   backward-word
+bindkey '^l^q'   push-line
+bindkey '^t'   forward-word
+bindkey '^z'   accept-and-hold
+
+bindkey '^X^G' list-expand
+# print "< bindkey '^X^B' vi-match-bracket >"
+# print "< now 'bd' means traverse dir-ring >"
+ # report 関数は使えない(使うと、zsh2.5.03 ではコアを吐く)
+
+# ^L 系列の remap.
+bindkey -r '^l'
+
+bindkey '^lu'  up-case-word
+bindkey '^ll'  down-case-word
+bindkey '^lc'  capitalize-word
+bindkey '^lq'  push-line
+bindkey '^lx'  execute-named-cmd
+bindkey '^l.'  insert-last-word
+bindkey '^l'\''' quote-line
+bindkey '^l"'    quote-region
+
+bindkey '^l^i' expand-word
+bindkey '^l^d' delete-word
+bindkey '^l^h' backward-delete-word
+bindkey '^l^w' copy-region-as-kill
+bindkey '^l^_' copy-prev-word
+bindkey '\e ' set-mark-command
+bindkey '^l^s' set-mark-command
+bindkey '^l^l' clear-screen
+bindkey '^lw' kill-region  # 逆だが, 仕方有るまい.
+bindkey '^l^k' kill-region
+bindkey '\e^k' kill-region
+
+rc_processed="TRUE"
+
+fi
+
+alias f='ls -CF'
+alias fs='ls -CFs'
+alias b='cd -'

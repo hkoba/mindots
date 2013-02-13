@@ -1,0 +1,17 @@
+# -*- mode: zsh -*-
+setopt autolist list_types nohup correct autocd appendhistory
+setopt histignoredups nobanghist 
+setopt autopushd pushdignoredups pushdsilent  pushdtohome
+setopt numeric_glob_sort interactivecomments
+# history with timestamp
+setopt extended_history
+unsetopt flow_control
+setopt transientrprompt
+
+#  setopt MAGIC_EQUAL_SUBST
+unsetopt histnostore bgnice automenu
+if [[ "$TERM" != emacs ]]; then
+  setopt extendedglob no_prompt_sp
+else
+  unsetopt extendedglob 
+fi
