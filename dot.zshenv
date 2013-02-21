@@ -7,3 +7,7 @@ path+=(
     ~/Local/bin
     ~/mytools
 )
+
+if [[ -r ~/Local/zshenv ]]; then
+  source ~/Local/zshenv
+fi
