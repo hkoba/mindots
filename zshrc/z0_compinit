@@ -1,0 +1,9 @@
+if ! (($+functions[compinit])); then
+  autoload -U compinit
+  compinit
+fi
+
+zstyle ':completion:*' completer _complete _list _match
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*' matcher-list ''
+zstyle ':completion:*' menu 'select=long-list' 'select=0'
