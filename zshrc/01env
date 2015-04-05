@@ -1,7 +1,8 @@
-HISTFILE=$HOME/.history.d/$HOST.$TTY:t
-[[ -d $HISTFILE:h ]] || mkdir $HISTFILE:h
+HISTFILE=$HOME/.zhistory
 HISTSIZE=2048
-SAVEHIST=$HISTSIZE
+SAVEHIST=$[HISTSIZE*100]
+setopt INC_APPEND_HISTORY
+setopt HIST_IGNORE_DUPS
 
 if (( $SHLVL > 1 )) ;then
   PROMPT="%SZ%s-%m($SHLVL"":%l)%% "
