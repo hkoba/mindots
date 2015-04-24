@@ -5,9 +5,9 @@ setopt INC_APPEND_HISTORY
 setopt HIST_IGNORE_DUPS
 
 if (( $SHLVL > 1 )) ;then
-  PROMPT="%SZ%s-%m($SHLVL"":%l)%% "
+  PROMPT="%SZ%s-%m($SHLVL"":%l)%# "
 else
-  PROMPT="%SZ%s-%m(%l)%% "
+  PROMPT="%SZ%s-%m(%l)%# "
 fi
 
 PROMPT2='> '
