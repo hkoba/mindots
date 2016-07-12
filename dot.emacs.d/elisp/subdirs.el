@@ -1,4 +1,6 @@
-;; ¤³¤Î¥Õ¥¡¥¤¥ë¤Î¤¢¤ë¥Ç¥£¥ì¥¯¥È¥ê°Ê²¼¡¢¤¹¤Ù¤Æ¤Î¥Ç¥£¥ì¥¯¥È¥ê¤ò load-path ¤Ø
+;; -*- coding: utf-8 -*-
+;; ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚ã‚‹ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªä»¥ä¸‹ã€ã™ã¹ã¦ã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ load-path ã¸
 (let ((default-directory (file-name-directory load-file-name)))
   (normal-top-level-add-to-load-path (list default-directory))
-  (normal-top-level-add-subdirs-to-load-path))
+  (normal-top-level-add-subdirs-to-load-path)
+  (load "minimum.el"))
