@@ -1,0 +1,15 @@
+#compdef db
+# -*- mode: shell-script-mode; sh-shell: zsh; coding: utf-8 -*-
+
+local dbDir=~/db/monthly
+local usedDir=$dbDir/${(%):-%D{%Y%m}}
+
+# _files -g "$usedDir/*(N:s,$usedDir/,,)"
+
+local files pat="$usedDir/$PREFIX"
+
+files=($~pat*(N))
+
+compadd -f $files(:s,$usedDir/,,)
+
+return 0

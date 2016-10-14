@@ -1,0 +1,36 @@
+#!/bin/zsh
+# -*- coding: utf-8 -*-
+
+# 引数があったら, db/monthly/月/引数 ディレクトリに
+# 無ければ db/monthly/月 に。
+# chdir し、print する。
+
+# 'db -' として起動した場合で、既に db ディレクトリにいる場合は、
+# 月をさかのぼる。
+
+local chpwd_functions; chpwd_functions=();
+local month
+if [[ "$1" = [-+]* && "$PWD" = ~/db/monthly/* ]]; then
+    local now=${PWD#~/db/monthly/}
+    if [[ "$1" == [-+] ]]; then
+	1=${1}1
+    fi
+    month=$(date +%Y%m -d "$now[1,4]-$now[5,6]-01 $1 months")
+    shift
+else
+    month=$(date +%Y%m)
+fi
+
+local dbdir=~/db/monthly/$month
+[[ -d $dbdir ]] || mkdir -p $dbdir
+
+local dir
+if [[ -n "$1" ]]; then
+    dir=$dbdir/$1
+    # [[ -f $dir ]] || {echo 1>&2 no such db directory $dir; false}
+else
+    dir=$dbdir
+fi
+[[ -d $dir ]] && cd $dir
+print $dir
+
