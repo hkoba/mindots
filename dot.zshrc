@@ -1,18 +1,25 @@
-# -*- mode: zsh -*-
-{
-  if [[ $HOME:t != $USER ]]; then
-     export HOME=$HOME:h/$USER
-  fi
-  local fn dotdir
-  for dotdir in ~/Local/zshrc ~/mindots/zshrc; do
-     [[ -d $dotdir ]] && break
+# Created by newuser for 5.0.2
+
+source ~/mindots/zshrc/keybind
+
+() {
+  local dn fn _fn
+  for dn in ~/mindots/zfunc ~/hktools/zfuncs; do
+    [[ -d $dn ]] || continue
+    fpath+=($dn)
+    for fn in $dn/[a-z]*; do
+       autoload $fn:t
+       _fn=$dn/_$fn:t
+       if [[ -r $_fn ]]; then
+         autoload $_fn:t
+         compdef $_fn:t $fn:t
+       fi
+    done
+    autoload $dn/*(:t)
   done
-  for fn in $dotdir/*(N); do
-     source $fn
-  done
-  if [[ -r ~/.zshrc.$HOST ]]; then
-    source ~/.zshrc.$HOST
+
+  fn=~/.zshrc.$HOST
+  if [[ -r $fn ]]; then
+    source $fn
   fi
-} always {
-  unset fn dotdir
 }
