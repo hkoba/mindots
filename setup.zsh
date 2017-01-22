@@ -19,9 +19,8 @@ function x {
   function {
     local fn rel dst
     for fn in $thisDir/dot.*; do
-       rel=${fn#$HOME/}
        dst=$HOME/$fn:t:s/dot././
-       x ln -vnsf $rel $dst
+       x ln -vnsfr $fn $dst
     done
   }
 } always {
