@@ -1,6 +1,5 @@
-# Created by newuser for 5.0.2
 
-source ~/mindots/zshrc/keybind
+source ${$(readlink -f ~/.zshrc):h}/zshrc/keybind
 
 () {
   autoload colors; colors

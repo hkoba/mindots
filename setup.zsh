@@ -16,13 +16,13 @@ function x {
 }
 
 {
-  function {
+  () {
     local fn rel dst
     for fn in $thisDir/dot.*; do
        dst=$HOME/$fn:t:s/dot././
-       x ln -vnsfr $fn $dst
+       [[ -e $dst ]] || x ln -vnsfr $fn $dst
     done
   }
 } always {
-  echo DONE
+    (($#o_dryrun)) || echo DONE
 }

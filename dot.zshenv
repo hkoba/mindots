@@ -8,6 +8,10 @@ path+=(
     ~/mytools
 )
 
+: ${XAUTHORITY:=~/.Xauthority}
+export XAUTHORITY
+
+
 if [[ -r ~/Local/zshenv ]]; then
   source ~/Local/zshenv
 fi
