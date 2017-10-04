@@ -1,3 +1,4 @@
+# -*- mode: shell-script; sh-shell: zsh; coding: utf-8 -*-
 
 source ${$(readlink -f ~/.zshrc):h}/zshrc/keybind
 
@@ -77,8 +78,8 @@ source ${$(readlink -f ~/.zshrc):h}/zshrc/keybind
     autoload $dn/*(:t)
   done
 
-  fn=~/.zshrc.$HOST
-  if [[ -r $fn ]]; then
-    source $fn
-  fi
+  for fn in ~/.zshrc.$HOST ~/Local/dotzsh/zshrc; do
+      [[ -r $fn ]] || continue
+      source $fn
+  done
 }

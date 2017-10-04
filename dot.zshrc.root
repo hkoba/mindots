@@ -1,0 +1,25 @@
+#!/bin/zsh
+alias b='cd $OLDPWD'
+# alias vi='vim'
+stty -ixon -ixoff
+# if [[ $TERM == [xk]term* ]]; then
+#   autoload precmd chpwd 
+# fi
+path+=(~hkoba/db/bin ~hkoba/db/mytools)
+fpath+=(~hkoba/lib/zsh)
+for n in $LOGNAME $USER; do
+	f=~$n/db/lib/zsh/bind
+	[[ -r $f ]] && source $f && break
+done
+compctl -g '/var/run/*(:t)' killhup
+compctl -g '/etc/init.d/*(.:t)' service chkconfig
+autoload killhup
+
+PROMPT="%# "
+RPROMPT=' %~'
+EDITOR=vim
+
+setopt transientrprompt
+
+# root svkroot should be isolated.
+unset SVKROOT

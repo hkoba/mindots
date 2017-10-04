@@ -29,6 +29,7 @@
              (if (and (file-directory-p file)
                       (file-exists-p fn))
                  (condition-case err
+		     (message "loading %s" fn)
                      (load fn)
                    (error
                     (message "Can't load %s: %s" fn err)))
