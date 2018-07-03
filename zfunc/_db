@@ -1,5 +1,4 @@
 #compdef db
-# -*- mode: shell-script-mode; sh-shell: zsh; coding: utf-8 -*-
 
 autoload is-at-least
 
@@ -20,3 +19,9 @@ files=($~pat*(N))
 compadd -f $files(:s,$usedDir/,,)
 
 return 0
+
+# Local Variables:
+# mode: shell-script
+# sh-shell: zsh
+# coding: utf-8
+# End:
