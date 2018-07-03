@@ -6,7 +6,7 @@ autoload is-at-least
 local dbDir=~/db/monthly
 local usedDir;
 if is-at-least 5.2; then
-  usedDir=$dbDir/${(%):-%D{%Y%m}}
+  usedDir=$dbDir/${(%):-"%D{%Y%m}"}
 else
   usedDir=$dbDir/$(date +%Y%m)
 fi
