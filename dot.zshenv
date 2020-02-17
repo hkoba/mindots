@@ -12,7 +12,7 @@ if (($path[(ri)$HOME/bin] > $#path)); then
       ~/mytools
       ~/db/bin
       ~/bin
-
+      ~/db/devbox/tools
       ~/.cargo/bin
   )
 fi

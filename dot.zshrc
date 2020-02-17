@@ -65,7 +65,7 @@ source ${$(readlink -f ~/.zshrc):h}/zshrc/keybind
     autoload $dn/*(:t)
   done
 
-  for fn in ~/.zshrc.$HOST ~/Local/dotzsh/zshrc; do
+  for fn in ~/.zshrc.$HOST ~/Local/dotzsh/zshrc ~/Local/dotzsh/*.inc(N); do
       [[ -r $fn ]] || continue
       source $fn
   done
