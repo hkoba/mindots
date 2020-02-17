@@ -1,12 +1,11 @@
 #compdef db
-# -*- mode: shell-script-mode; sh-shell: zsh; coding: utf-8 -*-
 
 autoload is-at-least
 
 local dbDir=~/db/monthly
 local usedDir;
 if is-at-least 5.2; then
-  usedDir=$dbDir/${(%):-%D{%Y%m}}
+  usedDir=$dbDir/${(%):-"%D{%Y%m}"}
 else
   usedDir=$dbDir/$(date +%Y%m)
 fi
@@ -20,3 +19,9 @@ files=($~pat*(N))
 compadd -f $files(:s,$usedDir/,,)
 
 return 0
+
+# Local Variables:
+# mode: shell-script
+# sh-shell: zsh
+# coding: utf-8
+# End:
