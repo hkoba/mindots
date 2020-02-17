@@ -16,6 +16,9 @@ bindkey '^l^q'   push-line
 bindkey '^t'   forward-word
 bindkey '^z'   accept-and-hold
 
+# widget に $NUMERIC を渡して挙動を変えたい
+bindkey '^u'   universal-argument
+
 bindkey '^X^G' list-expand
 # print "< bindkey '^X^B' vi-match-bracket >"
 # print "< now 'bd' means traverse dir-ring >"

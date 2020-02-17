@@ -58,23 +58,10 @@ source ${$(readlink -f ~/.zshrc):h}/zshrc/keybind
   HISTSIZE=5000
   SAVEHIST=$[HISTSIZE*100]
 
-  if ! (($+functions[compdef])); then
-    autoload -U compinit
-    compinit -u
-  fi
-
   local dn fn _fn
   for dn in ~/mindots/zfunc ~/hktools/zfuncs; do
     [[ -d $dn ]] || continue
     fpath+=($dn)
-    for fn in $dn/[a-z]*; do
-       autoload $fn:t
-       _fn=$dn/_$fn:t
-       if [[ -r $_fn ]]; then
-         autoload $_fn:t
-         compdef $_fn:t $fn:t
-       fi
-    done
     autoload $dn/*(:t)
   done
 
@@ -82,4 +69,9 @@ source ${$(readlink -f ~/.zshrc):h}/zshrc/keybind
       [[ -r $fn ]] || continue
       source $fn
   done
+  
+  if ! (($+functions[compdef])); then
+    autoload -U compinit
+    compinit -u
+  fi
 }
