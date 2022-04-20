@@ -1,0 +1,136 @@
+#!/usr/bin/env TclTaskRunner.tcl
+# -*- mode: tcl -*-
+
+#
+# ./main.tcltask を実行した時に呼び出されるタスク(ALL)の宣言
+#
+default target ALL
+
+#========================================
+
+# このスクリプトの置かれたディレクトリを $self のメンバー変数へ保存
+variable scriptDir [file dirname [info script]]
+
+# オプション群。今は単なる定数の括りだし
+# （コマンド行から一度限りでこれらをオーバーライドすることにどの程度メリットが？
+
+option -variant-symbol jp_us
+option -xkb-dir        /usr/share/X11/xkb
+option -symbol-file    jp
+option -rule           evdev
+
+#========================================
+# 以下、実際のタスク定義
+
+#
+# symbols/jp に jp_us の定義が無ければ加える
+#
+ALL depends target symbols check {
+    expr {$options(-variant-symbol) in [$self list_xkb_symbols]}
+} action {
+    ** exec {*}[may-sudo] tee -a [$self symbol-file] < [$self symbol-source] \
+         2>@ stderr
+}
+
+#
+# rules/evdev.lst に jp_us の宣言が無ければ加える
+#
+ALL depends target rule-lst check {
+    expr {$options(-variant-symbol) in [$self read-rule-list 1]}
+} action {
+    ** exec {*}[may-sudo] perl -i -nle {
+        print;
+        if (/^! variant/) {
+            print q(  jp_us           jp: Japanese (JP106 with US));
+        }
+    } [$self rule-list-file] 2>@ stderr
+}
+
+#
+# rules/evdev.xml に jp_us の宣言が無ければ加える
+#
+
+ALL depends target rule-xml dependsTasks xpath check {
+    expr {$options(-variant-symbol) in [$self read-rule-xml]}
+} action {
+    ** exec {*}[may-sudo] perl -i -0 -ne {
+        s{(<layout>\s*<configItem>\s*<name>jp</name>.*?)(</variantList>)}{
+            $1 . q{
+         <variant>
+           <configItem>
+             <name>jp_us</name>
+             <description>JP106 with US layout</description>
+           </configItem>
+         </variant>
+            } . $2
+        }es;
+        print;
+    } [$self rule-xml-file] 2>@ stderr
+}
+
+#
+# xpath コマンドが無ければインストールする
+#
+target xpath check {
+    expr {[auto_execok $target] ne ""}
+} action {
+    ** exec dnf install -y $target
+}
+
+#========================================
+# 以下、下請けメソッド。コマンド行からサブコマンドとして呼び出し可能
+#========================================
+
+method read-rule-list {{keysOnly no}} {
+    set ls [exec perl -nle {
+        next unless /^! variant/ .. /^\s*$/;
+        my @kv = /^\s*(\S+)\s+jp: (.*)/ or next;
+        print join "\t", @kv
+    } [$self rule-list-file]]
+
+    if {$keysOnly} {
+        lmap i [split $ls \n] {lindex $i 0}
+    } else {
+        return $ls
+    }
+}
+
+method rule-list-file {} {
+    return $options(-xkb-dir)/rules/$options(-rule).lst
+}
+
+method read-rule-xml {} {
+    exec xpath -q -e {
+        //layout/configItem/name[text() = "jp"]/parent::node()/parent::node()/variantList/variant/configItem/name/text()
+    } [$self rule-xml-file]
+}
+
+method rule-xml-file {} {
+    return $options(-xkb-dir)/rules/$options(-rule).xml
+}
+
+method symbol-source {} {
+    return $scriptDir/symbols/$options(-variant-symbol)
+}
+
+method symbol-file {} {
+    return $options(-xkb-dir)/symbols/$options(-symbol-file)
+}
+
+method list_xkb_symbols {args} {
+    if {$args eq ""} {
+        lappend args [$self symbol-file]
+    }
+    exec perl -nle {m{^xkb_symbols\s+\"([^\"]+)\"} and print $1} {*}$args
+}
+
+#========================================
+# 以下、下請け手続き
+# こちらはコマンド行から直接呼び出す手段は（現状）存在しない
+# 代わりに、$self 抜きで呼び出し可能
+
+proc may-sudo {} {
+    if {[exec id -u] != 0} {
+        list sudo
+    }
+}
