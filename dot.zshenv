@@ -2,18 +2,19 @@
 # For multi-user site.
 umask 002
 
-if (($path[(ri)$HOME/bin] > $#path)); then
+# to keep unique elements.
+typeset -U path
 
-  # to keep unique elements.
-  typeset -U path
+if (($path[(ri)$HOME/db/bin] > $#path)); then
 
   path+=(
       ~/Local/bin
       ~/mytools
       ~/db/bin
       ~/bin
-      ~/db/devbox/tools
       ~/.cargo/bin
+      ~/db/devbox/tools
+      ~/db/devbox/*/bin
   )
 fi
 
