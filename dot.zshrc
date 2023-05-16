@@ -69,8 +69,8 @@ source ${$(readlink -f ~/.zshrc):h}/zshrc/keybind
       [[ -r $fn ]] || continue
       source $fn
   done
-  
-  if ! (($+functions[compdef])); then
+
+  if [[ -o interactive ]] && ! (($+functions[compdef])); then
     autoload -U compinit
     compinit -u
   fi
