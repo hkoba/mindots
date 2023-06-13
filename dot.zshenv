@@ -14,7 +14,7 @@ if (($path[(ri)$HOME/db/bin] > $#path)); then
       ~/bin
       ~/.cargo/bin
       ~/db/devbox/tools
-      ~/db/devbox/*/bin
+      ~/db/devbox/*/bin(N)
   )
 fi
 
