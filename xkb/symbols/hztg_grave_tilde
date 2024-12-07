@@ -1,5 +1,0 @@
-
-partial alphanumeric_keys
-xkb_symbols "hztg_grave_tilde" {
-    replace key <HZTG>  {[ grave, asciitilde ]};
-};
