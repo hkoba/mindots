@@ -51,7 +51,7 @@ ALL depends target rule-lst check {
 #
 
 ALL depends target rule-xml dependsTasks xpath check {
-    expr {$options(-variant-symbol) in [$self read-rule-xml]}
+    expr {$options(-variant-symbol) in [$self rule-xml-variant-list]}
 } action {
     ** exec {*}[may-sudo] perl -i -0 -ne {
         s{(<layout>\s*<configItem>\s*<name>jp</name>.*?)(</variantList>)}{
@@ -68,13 +68,50 @@ ALL depends target rule-xml dependsTasks xpath check {
     } [$self rule-xml-file] 2>@ stderr
 }
 
+
+#----------------------------------------
+# 全/半 キーを Grave(`)/AsciiTilde(~) に戻すオプション
+#----------------------------------------
+
+ALL depends target {hztg_grave_tilde symbol} check {
+    expr {[lindex $target 0] in [$self list_xkb_symbols]}
+} action {
+    ** exec {*}[may-sudo] tee -a [$self symbol-file] \
+        < [$self symbol-source [lindex $target 0]] \
+         2>@ stderr
+}
+
+#
+# rules/evdev.lst に japan:hztg_grave_tilde オプションが無ければ加える
+#
+
+ALL depends target {hztg_grave_tilde option-list} check {
+    expr {[lindex $target 0] in [dict get [$self read-rule-option-dict] japan]}
+} action {
+    $self append-rule-list-option \
+        japan:[lindex $target 0] "Make Zenkaku Hankaku an additional Grave"
+}
+
+#
+# rules/evdev.xml に japan:hztg_grave_tilde オプションが無ければ加える
+#
+
+ALL depends target {hztg_grave_tilde option-xml} dependsTasks xpath check {
+    expr {[lindex $target 0] in [$self rule-xml-option-list]}
+} action {
+    $self append-rule-xml-option \
+        japan:[lindex $target 0] "Make Zenkaku Hankaku an additional Grave"
+}
+
+#========================================
+
 #
 # xpath コマンドが無ければインストールする
 #
 target xpath check {
-    expr {[auto_execok $target] ne ""}
+    expr {[auto_execok $target] ne "" || [file executable $target]}
 } action {
-    ** exec dnf install -y $target
+    ** exec {*}[may-sudo] dnf install -y /usr/bin/$target
 }
 
 #========================================
@@ -95,26 +132,107 @@ method read-rule-list {{keysOnly no}} {
     }
 }
 
+# ./main.tcltask -n append-rule-list-option japan:hztg_grave_tilde "Make Zenkaku Hankaku an additional Grave"
+
+method append-rule-list-option {groupItem title} {
+    lassign [split $groupItem :] groupName _optionName
+
+    set opts [if {![IS_DRY_RUN]} {list -i}]
+
+    set map [list @GROUP@ $groupName @ITEM@ $groupItem @TITLE@ $title]
+
+    set cmd [list {*}[may-sudo] perl {*}$opts -ple [string map $map {
+        next unless (/^! option/ .. (/^\s*$/ || eof));
+        my $groupLine = /^\s+@GROUP@:/ .. /^\s+(?!@GROUP@)\w+/;
+        if ($groupLine =~ /E0/) {
+            # print STDERR "# ($groupLine) $_";
+            print "  @ITEM@    @TITLE@";
+        }
+    }] [$self rule-list-file]]
+
+    puts "# $cmd"
+
+    exec {*}$cmd >@ stdout 2>@ stderr
+}
+
+method append-rule-xml-option {groupItem title} {
+    lassign [split $groupItem :] groupName _optionName
+
+    set opts [if {![IS_DRY_RUN]} {list -i}]
+
+    set map [list @GROUP@ $groupName @ITEM@ $groupItem @TITLE@ $title]
+
+    set cmd [list {*}[may-sudo] perl {*}$opts -0 -ne [string map $map {
+        s{(<group[^>]*>\s*<configItem>\s*<name>@GROUP@</name>.*?)(</group>)}{
+            $1 . q{
+      <option>
+        <configItem>
+          <name>@ITEM@</name>
+          <description>@TITLE@</description>
+        </configItem>
+      </option>
+    } . $2}es;
+        print;
+    }] [$self rule-xml-file]]
+
+    puts "# $cmd"
+
+    exec {*}$cmd >@ stdout 2>@ stderr
+}
+
+method read-rule-option-dict {} {
+    set dict []
+    foreach item [$self read-rule-option-list] {
+        incr lineNo
+        if {[regexp {^([^:]+):(.*)} $item -> group opt]} {
+            dict lappend dict $group $opt
+        }
+    }
+    set dict
+}
+
+method read-rule-option-list {} {
+    exec perl -nle {
+        next unless /^! option/ .. /^\s*$/;
+        my ($item) = /^\s*(\S+)/ or next;
+        print $item
+    } [$self rule-list-file]
+}
+
 method rule-list-file {} {
     return $options(-xkb-dir)/rules/$options(-rule).lst
 }
 
-method read-rule-xml {} {
-    exec xpath -q -e {
-        //layout/configItem/name[text() = "jp"]/parent::node()/parent::node()/variantList/variant/configItem/name/text()
-    } [$self rule-xml-file]
+method rule-xml-variant-list {{lang "jp"}} {
+    exec xpath -q -e [string map [list @LANG@ $lang] {
+        //layout/configItem/name[text() = "@LANG@"]/parent::node()/parent::node()/variantList/variant/configItem/name/text()
+    }] [$self rule-xml-file]
+}
+
+method rule-xml-option-list {{group "japan"}} {
+    set output [exec xpath -q -e [string map [list @GROUP@ $group] {
+        //group/configItem/name[text() = "@GROUP@"]/parent::node()/parent::node()/option/configItem/name/text()
+    }] [$self rule-xml-file]]
+
+    regsub -all -line ^$group: $output {}
 }
 
 method rule-xml-file {} {
     return $options(-xkb-dir)/rules/$options(-rule).xml
 }
 
-method symbol-source {} {
-    return $scriptDir/symbols/$options(-variant-symbol)
+method symbol-source {{target ""}} {
+    if {$target eq ""} {
+        set target $options(-variant-symbol)
+    }
+    return $scriptDir/symbols/$target
 }
 
-method symbol-file {} {
-    return $options(-xkb-dir)/symbols/$options(-symbol-file)
+method symbol-file {{target ""}} {
+    if {$target eq ""} {
+        set target $options(-symbol-file)
+    }
+    return $options(-xkb-dir)/symbols/$target
 }
 
 method list_xkb_symbols {args} {
