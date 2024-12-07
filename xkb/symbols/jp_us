@@ -18,4 +18,5 @@ xkb_symbols "jp_us" {
     key <AC12> { symbols[Group1]= [           grave,      asciitilde ] };
     key <AB11> { symbols[Group1]= [       backslash,             bar ] };
 
+    key <HZTG> { symbols[Group1]= [           grave,      asciitilde ], type[group1]="ALPHABETIC" };
 };
