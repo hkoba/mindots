@@ -13,6 +13,7 @@ if (($path[(ri)$HOME/db/bin] > $#path)); then
       ~/db/bin
       ~/bin
       ~/.cargo/bin
+      ~/.elan/bin
       ~/db/devbox/tools
       ~/db/devbox/zig/latest
       ~/db/devbox/*/bin(N)
