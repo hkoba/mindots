@@ -75,3 +75,6 @@ source ${$(readlink -f ~/.zshrc):h}/zshrc/keybind
     compinit -u
   fi
 }
+
+# bun completions
+[ -s "/home/ssri/peco/dot.bun/_bun" ] && source "/home/ssri/peco/dot.bun/_bun"
